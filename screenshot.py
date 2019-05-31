@@ -53,7 +53,7 @@ class ScreenShot(object):
             status_json = json.loads(response.text)
             logger.info(f"status_json['value']['ready'] = {status_json['value']['ready'] == 'true'}")
             return status_json['value']['ready']
-        except ConnectionError as err:
+        except requests.exceptions.ConnectionError as err:
             logger.warning(f'{err} occurred. Calling the func after one second..')
             time.sleep(1)
             return self.check_hub_status()
