@@ -6,14 +6,15 @@ import tldextract
 import logging
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from urllib3.exceptions import ProtocolError
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format='[%(asctime)s] [%(levelname)s] [(%(funcName)s)(%(lineno)d)] %(message)s',
                     datefmt='%Y-%b-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
-
 CHROMEDRIVER = 'http://172.17.0.1:4444/wd/hub'
+
 
 class ScreenShot(object):
 
@@ -48,11 +49,15 @@ class ScreenShot(object):
         logger.info('screenshot has been saved.')
 
     def check_hub_status(self):
-        response = requests.get(CHROMEDRIVER + '/status')
-        status_json = json.loads(response.text)
-        logger.info(status_json['value']['ready'])
-        logger.info(f"status_json['value']['ready'] == 'true' -> {status_json['value']['ready'] == 'true'}")
-        return status_json['value']['ready']
+        try:
+            response = requests.get(CHROMEDRIVER + '/status')
+            status_json = json.loads(response.text)
+            logger.info(f"status_json['value']['ready'] = {status_json['value']['ready'] == 'true'}")
+            return status_json['value']['ready']
+        except ProtocolError as err:
+            logger.warning(f'{err} occurred. Calling the func after one second..')
+            time.sleep(1)
+            return self.check_hub_status()
 
 
 if __name__ == '__main__':
