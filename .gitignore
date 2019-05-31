@@ -133,4 +133,5 @@ dmypy.json
 # .git
 .git
 
-# End of https://www.gitignore.io/api/python
+# output file
+output

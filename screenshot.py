@@ -6,7 +6,6 @@ import tldextract
 import logging
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from urllib3.exceptions import ProtocolError
 
 logging.basicConfig(level=logging.INFO,
                     format='[%(asctime)s] [%(levelname)s] [(%(funcName)s)(%(lineno)d)] %(message)s',
@@ -54,7 +53,7 @@ class ScreenShot(object):
             status_json = json.loads(response.text)
             logger.info(f"status_json['value']['ready'] = {status_json['value']['ready'] == 'true'}")
             return status_json['value']['ready']
-        except ProtocolError as err:
+        except ConnectionError as err:
             logger.warning(f'{err} occurred. Calling the func after one second..')
             time.sleep(1)
             return self.check_hub_status()
