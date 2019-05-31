@@ -1,4 +1,7 @@
+import json
 import time
+
+import requests
 import tldextract
 import logging
 from selenium import webdriver
@@ -44,11 +47,23 @@ class ScreenShot(object):
         browser.save_screenshot(file_name)
         logger.info('screenshot has been saved.')
 
+    def check_hub_status(self):
+        response = requests.get(CHROMEDRIVER + '/status')
+        status_json = json.loads(response.text)
+        logger.info(status_json['value']['ready'])
+        logger.info(f"status_json['value']['ready'] == 'true' -> {status_json['value']['ready'] == 'true'}")
+        return status_json['value']['ready']
+
 
 if __name__ == '__main__':
     url = 'https://dofo.com'
 
     inst = ScreenShot()
+
+    while not inst.check_hub_status():
+        logger.info('waiting for chromedriver..')
+        time.sleep(1)
+
     browser = inst.prepare_browser()
 
     try:

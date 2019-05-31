@@ -17,8 +17,10 @@ services:
     environment:
       - HUB_HOST=selenium-hub
       - HUB_PORT=4444
-#  app:
-#    image: sspy
-#    container_name: sspy
-#    depends_on:
-#      - chrome
+  app:
+    image: sspy
+    container_name: sspy
+    depends_on:
+      - chrome
+    volumes:
+      - .:/app
