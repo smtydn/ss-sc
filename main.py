@@ -37,5 +37,6 @@ if __name__ == '__main__':
             ScreenShotChrome.get_screenshot(driver, file_name)
         finally:
             driver.quit()
+        logger.info(f'screenshot has taken at {time.time() - start:.2f} seconds.')
 
-    logger.info(f'TIMELAPSE: {time.time()-start:.2f}')
+    logger.info(f'TOTAL TIME: {time.time()-start:.2f} seconds.')
