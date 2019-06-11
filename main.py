@@ -1,6 +1,6 @@
 import time
 import logging
-from screenshot import ScreenShot
+from screenshot_chrome import ScreenShotChrome
 
 
 logging.basicConfig(level=logging.INFO,
@@ -9,21 +9,33 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 
-urls = ['https://dofo.com/', 'https://www.blogger.com/', 'https://www.apple.com/',
-        'https://www.adobe.com/', 'https://play.google.com/store', 'https://www.youtube.com/',
-        'https://www.microsoft.com/tr-tr/', 'https://wordpress.org/', 'https://www.sahibinden.com/',
-        'https://www.mozilla.org/tr/', 'https://www.linkedin.com/', 'https://vimeo.com/',
-        'https://creativecommons.org/', 'https://github.com/',
-        'https://www.bbc.com/', 'https://vk.com/', 'https://www.amazon.com/', 'https://www.dailymotion.com/tr',
-        'https://outlook.live.com/', 'https://www.istockphoto.com/', 'https://medium.com/',
-        'https://www.facebook.com/', 'https://www.reuters.com/', 'https://www.dropbox.com/', 'https://www.uol.com.br/',
-        'https://www.paypal.com/tr/home', 'https://www.nytimes.com/']
+def gen_url():
+    with open('domains.txt') as f:
+        for url in f:
+            url = url.strip('\n')
+            yield 'https://www.' + url + '/'
 
-
-urls = ['https://dofo.com/', 'https://www.apple.com/', 'https://www.blogger.com/', 'https://www.dailymotion.com/tr',
-        'https://medium.com/', 'https://vimeo.com/', 'https://vk.com/', 'https://www.youtube.com/']
 
 if __name__ == '__main__':
     start = time.time()
-    ScreenShot().main(urls)
+
+    while not ScreenShotChrome.check_hub_status():
+        time.sleep(.1)
+
+    for url in gen_url():
+        url_start = time.time()
+        driver = ScreenShotChrome.prepare_browser()
+        try:
+            logger.info(url)
+            driver.get(url)
+            height = ScreenShotChrome.get_height(driver, url)
+            driver.quit()
+            driver = ScreenShotChrome.prepare_browser(height)
+            driver.get(url)
+
+            file_name = ScreenShotChrome.get_file_name(driver)
+            ScreenShotChrome.get_screenshot(driver, file_name)
+        finally:
+            driver.quit()
+
     logger.info(f'TIMELAPSE: {time.time()-start:.2f}')

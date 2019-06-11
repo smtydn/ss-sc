@@ -17,6 +17,17 @@ services:
     environment:
       - HUB_HOST=selenium-hub
       - HUB_PORT=4444
+#  firefox:
+#    restart: always
+#    image: selenium/node-firefox
+#    container_name: firefox
+#    volumes:
+#      - /dev/shm:/dev/shm
+#    depends_on:
+#      - selenium-hub
+#    environment:
+#      - HUB_HOST=selenium-hub
+#      - HUB_PORT=4444
   app:
     image: sspy
     container_name: sspy
