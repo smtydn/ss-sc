@@ -16,8 +16,6 @@ def cli(outputdir, domainfile):
             filename = CallJS.create_filename(domain)
             filepath = CallJS.get_filepath(filename, outputdir)
 
-            logger.info(f"Domain: {domain}, URL: {url}, Filename: {filename}, Filepath: {filepath}")
-
             # Calling node.js for screen shot
             CallJS.call_puppeteer(url, filepath)
 
