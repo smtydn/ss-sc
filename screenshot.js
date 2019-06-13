@@ -9,7 +9,7 @@ log4js.configure({
 const logger = log4js.getLogger('ss');
 
 (async () => {
-    const browser = await puppeteer.launch({defaultViewport: null});
+    const browser = await puppeteer.launch({defaultViewport: null, args: ['--no-sandbox', '--disable-setuid-sandbox']});
     const page = await browser.newPage();
 
     let argv = require('minimist')(process.argv.slice(2));
