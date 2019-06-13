@@ -1,42 +1,30 @@
-import time
-import logging
-from screenshot_chrome import ScreenShotChrome
+import click
+from call_js import *
 
-
-logging.basicConfig(level=logging.INFO,
-                    format='[%(asctime)s] [%(levelname)s] [(%(funcName)s)(%(lineno)d)] %(message)s',
-                    datefmt='%Y-%b-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
 
-def gen_url():
-    with open('domains.txt') as f:
-        for url in f:
-            url = url.strip('\n')
-            yield 'https://www.' + url + '/'
+@click.command()
+@click.option('--outputdir', default='output', help='Output directory.')
+@click.option('--domainfile', default='domains.txt', help='Domain file.')
+def cli(outputdir, domainfile):
+    with open(domainfile) as f:
+        for line in f:
+            # Creating required variables
+            domain = line.strip('\n')
+            url = CallJS.url_from_domain(domain)
+            filename = CallJS.create_filename(domain)
+            filepath = CallJS.get_filepath(filename, outputdir)
+
+            logger.info(f"Domain: {domain}, URL: {url}, Filename: {filename}, Filepath: {filepath}")
+
+            # Calling node.js for screen shot
+            CallJS.call_puppeteer(url, filepath)
+
+            # Checking for hanging Chromium instances
+            pid_list = CallJS.get_pid('chromium')
+            CallJS.kill_process(pid_list)
 
 
 if __name__ == '__main__':
-    start = time.time()
-
-    while not ScreenShotChrome.check_hub_status():
-        time.sleep(.1)
-
-    for url in gen_url():
-        url_start = time.time()
-        driver = ScreenShotChrome.prepare_browser()
-        try:
-            logger.info(url)
-            driver.get(url)
-            height = ScreenShotChrome.get_height(driver, url)
-            driver.quit()
-            driver = ScreenShotChrome.prepare_browser(height)
-            driver.get(url)
-
-            file_name = ScreenShotChrome.get_file_name(driver)
-            ScreenShotChrome.get_screenshot(driver, file_name)
-        finally:
-            driver.quit()
-        logger.info(f'screenshot has taken at {time.time() - start:.2f} seconds.')
-
-    logger.info(f'TOTAL TIME: {time.time()-start:.2f} seconds.')
+    cli()
