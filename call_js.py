@@ -3,7 +3,7 @@ import signal
 import subprocess
 import logging
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     filename='calljs.log',
                     filemode='w',
                     format='[%(asctime)s] [%(levelname)s] [(%(funcName)s)(%(lineno)d)] %(message)s',
@@ -16,7 +16,7 @@ class CallJS(object):
     @classmethod
     def url_from_domain(cls, domain):
         url = 'https://www.' + domain
-        logger.debug(f"URL: {url}")
+        logger.info(f"URL: {url}")
         return url
 
     @classmethod
@@ -38,7 +38,7 @@ class CallJS(object):
         try:
             process = subprocess.Popen(['node', 'screenshot.js', f'--url={url}', f'--filename={filepath}'])
             process.wait(10)
-            logger.info(f'{url}\'s screen shot has taken with no problem!')
+            logger.info(f'{url}\'s screen shot has taken!')
         except subprocess.TimeoutExpired as err:
             logger.warning(f"{err}!")
 

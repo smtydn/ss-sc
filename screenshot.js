@@ -3,7 +3,7 @@ const log4js = require('log4js');
 
 log4js.configure({
     appenders: {ss: {type: 'file', filename: `screenshotjs.log`}},
-    categories: {default: {appenders: ['ss'], level: 'debug'}}
+    categories: {default: {appenders: ['ss'], level: 'info'}}
 });
 
 const logger = log4js.getLogger('ss');
