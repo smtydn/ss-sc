@@ -4,7 +4,7 @@ const fs = require('fs');
 const readline = require('readline');
 
 // I/O variables
-const inputFile = 'domains.txt';
+const inputFile = 'domain5.txt';
 const outputDir = 'output';
 
 // Logging variables
@@ -13,7 +13,7 @@ const logLevel = 'info';
 
 
 log4js.configure({
-    appenders: {ss: {type: 'file', filename: logFile}},
+    appenders: {ss: {type: 'file', pngName: logFile}},
     categories: {default: {appenders: ['ss'], level: logLevel}}
 });
 
@@ -42,8 +42,10 @@ async function* processLineByLine() {
         const page = await browser.newPage();
 
         let queryUrl = 'https://www.' + domain;
-        let fileName = domain + '.png';
-        let filePath = outputDir + '/' + fileName;
+        let pngName = domain.split(".")[0] + '.png';
+        let pngPath = outputDir + '/' + pngName;
+        let htmlName = domain.split(".")[0] + '.html';
+        let htmlPath = outputDir + '/' + htmlName;
 
         // Check for output directory, create if does not exist.
         if (!fs.existsSync(outputDir)){
@@ -51,13 +53,23 @@ async function* processLineByLine() {
         }
 
         logger.info("URL: ", queryUrl);
-        logger.debug("File Name: ", fileName);
+        logger.debug("File Name: ", pngName);
 
         await page.setViewport({width: 1920, height: 1080});
         try {
             await page.goto(queryUrl, {waitUntil: 'networkidle0'});
-            await page.screenshot({ path: filePath, fullPage: true });
+            await page.screenshot({ path: pngPath, fullPage: true });
             logger.info("Screenshot has saved!");
+
+            let html = await page.evaluate(() => document.documentElement.outerHTML);
+
+            fs.writeFile(htmlPath, html, function (err) {
+                if(err) {
+                    return console.log(err);
+                }
+                logger.info(`${htmlName} was saved!`);
+            });
+
         } catch (ERR_CERT_COMMON_NAME_INVALID) {
             logger.warn('This URL is not valid!');
         } finally {
