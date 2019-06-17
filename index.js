@@ -1,10 +1,13 @@
 const express = require("express");
+const httpContext = require("express-http-context");
 const puppeteer = require('puppeteer');
 const log4js = require('log4js');
 
 // initializing express.js server
 const app = express();
 const port = 3000;
+
+app.use(httpContext.middleware);
 
 // logging configuration
 log4js.configure({
